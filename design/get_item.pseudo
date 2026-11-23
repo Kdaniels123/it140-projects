@@ -10,21 +10,39 @@
 START get_item
 
     # TODO 1: Identify the information the get-item process needs.
-    # Consider the current room, item in that room, and player's inventory.
+    # Needed state and inputs:
+    # - current_room (e.g., "Lobby", "Security Desk", "Breakroom", "Hardware Lab", 
+    # - "Network Closet", "Forensics Bay", "Backup Vault", "Server Core")
+    # - room_items (maps each room to its item, or NONE for "Lobby" and "Server Core") 
+    # - inventory (list of items collected by the player so far) 
+    # - item_command (the player"s get-item input, e.g., "get Access Badge") 
 
     # TODO 2: Prompt for and receive the player's get-item command.
+    OUTPUT "Enter an item command (for example, 'get <item name>'):"
+    SET item_command TO TRIM(INPUT)
+    SET requested_item TO EXTRACT_ITEM_NAME(item_command) 
 
     # TODO 3: Validate whether the requested item is available in the current
-    # room. Show the decision clearly.
+    # room. IF room_items[current_room] IS NOT NONE AND LOWERCASE(requested_item) IS LOWERCASE(room_items[current_room])
 
     # TODO 4: Describe what happens when the item request is valid.
-    # Include the inventory update and player output.
+    ADD room_items[current_room] TO inventory
+    OUTPUT "You collected the " + room_items[current_room] + "!"
+    SET room_items[current_room] TO NONE 
+  ELSE
 
     # TODO 5: Describe what happens when the item request is invalid.
-    # Include the output the player should receive.
+    IF room_items[current_room] IS NONE THEN
+        OUTPUT "There is no item to collect in " + current_room + "."
+    ELSE
+        OUTPUT "You cannot get '" + requested_item + "' here. Check the item in this room and try again."
+    END IF
+END IF
 
     # TODO 6: Show how the process returns to or continues the larger gameplay
     # loop after the command is handled.
+    OUTPUT "Current inventory: " + inventory
+    RETURN TO main_game_loop
 
 END get_item
 
