@@ -8,18 +8,40 @@
 # keywords such as INPUT, OUTPUT, IF, ELSE, WHILE, SET, or similar terms.
 
 # TODO 1: Identify the information the movement process needs.
-# Consider the player's current room and movement command.
+# Needed state and inputs:
+# - current_room (starts at "Lobby")
+# - room_connections (valid directions and target rooms from each room)
+# - inventory (list of collected items)
+# - required_items (6 items: Access Badge, Espresso Shot, Soldering Kit, Fiber Patch cable, Decryption Key, Cold Boot Drive)
+# - villain_room ("Server Core") and villain ("VEX-9")
+# - game_over (Boolean, initially FALSE)
+# - move_command (player input)
 
 # TODO 2: Prompt for and receive the player's movement command.
+OUTPUT "Enter a direction to move (north, south, east, west):"
+SET move_command TO LOWERCASE(TRIM(INPUT))
 
 # TODO 3: Validate whether the requested movement is possible from the
-# current room. Show the decision clearly.
+IF move_command IS IN valid_directions AND move_command EXISTS IN room_connections[current_room] THEN 
 
 # TODO 4: Describe what happens when the movement command is valid.
-# Include the room update and player output.
+SET current_room TO room_connections[current_room][move_command]
+OUTPUT "You move " + move_command + " into " + current_room + "."
 
-# TODO 5: Describe what happens when the movement command is invalid.
-# Include the output the player should receive.
+   IF current_room IS "Server Core" THEN 
+       IF inventory CONTAINS ALL 6 required_items THEN
+           OUTPUT "You override VEX-9's controls and stop the lockdown. You win!"
+       ELSE
+           OUTPUT "VEX-9 locks down the Server Core before you have all six items. Game over."
+       END IF 
+       SET game_over TO TRUE 
+  END IF
+ELSE
+
+      # TODO 5: Describe what happens when the movement command is invalid.
+      OUTPUT "You cannot move " + move_command + " from " + current_room + ". Try another direction."
+    END IF
+END WHILE
 
 # TODO 6: Show how movement fits into repeated gameplay.
-# The final game continues accepting commands until a required ending occurs.
+WHILE game_over IS FALSE
